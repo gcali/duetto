@@ -1,18 +1,23 @@
 <template lang="pug">
 input(v-model="readOnly", type="checkbox")
-.main
-  Word(:word="fullWord.word", :cardType="fullWord.type", :readOnly="readOnly", v-for="fullWord in fullWords", class="word", @selected="() => clickWord(fullWord)")
+input(v-model="generator")
+button(@click="generate") Generate
+.main(v-if="words")
+  Word(
+    :word="fullWord.word"
+    :cardType="fullWord.type"
+    :readOnly="readOnly"
+    v-for="fullWord in words"
+    class="word"
+    @selected="() => clickWord(fullWord)"
+  )
 </template>
 
 <script lang="ts">
-import { CardType } from '@/model/cards';
+import { FullWord } from '@/model/cards';
 import { defineComponent } from "vue";
 import Word from "./Word.vue";
-
-function randomIntFromInterval(min: number, max: number) { // min and max included 
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
+import {generateWords} from "@/services/word-generator";
 
 export default defineComponent({
   components: { Word },
@@ -22,31 +27,22 @@ export default defineComponent({
   },
   data() {
     return {
-      words: [
-        "dog", "cat", "llama", "eagle", "tiger"
-        ],
-      readOnly: false
+      readOnly: false,
+      generator: "apple"
     };
   },
   computed: {
-    fullWords() {
-      const words = this.words;
-      const needed = 25;
-      const result: {word: string; type: CardType}[] = [];
-      for (let i = 0; i < needed; i++) {
-        const w = words[randomIntFromInterval(0, words.length-1)];
-        result.push({
-          word: w,
-          type: i < 3 ? "black" : (i < 12 ? "green" : "brown")
-        });
-      }
-      result.sort((a, b) => Math.random() - 0.5);
-      return result;
+    words(): FullWord[] {
+      return this.$store.state.words || [];
     }
   },
   methods: {
     clickWord(word: {word: string; type: string}) {
       console.log(word);
+    },
+    generate() {
+      const words = generateWords(this.generator);
+      this.$store.commit("setAllWords", words)
     }
   }
 });
