@@ -1,6 +1,7 @@
 <template lang="pug">
+input(v-model="readOnly", type="checkbox")
 .main
-  Word(:word="fullWord.word", :cardType="fullWord.type" v-for="fullWord in fullWords", class="word")
+  Word(:word="fullWord.word", :cardType="fullWord.type", :readOnly="readOnly", v-for="fullWord in fullWords", class="word", @selected="() => clickWord(fullWord)")
 </template>
 
 <script lang="ts">
@@ -24,6 +25,7 @@ export default defineComponent({
       words: [
         "dog", "cat", "llama", "eagle", "tiger"
         ],
+      readOnly: false
     };
   },
   computed: {
@@ -40,6 +42,11 @@ export default defineComponent({
       }
       result.sort((a, b) => Math.random() - 0.5);
       return result;
+    }
+  },
+  methods: {
+    clickWord(word: {word: string; type: string}) {
+      console.log(word);
     }
   }
 });
