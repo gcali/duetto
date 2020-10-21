@@ -1,13 +1,19 @@
 <template lang="pug">
 .word-card(:class="[{['read-only']: readOnly}, wordCardClass]", @click="click")
-    | {{word}}
+    label.text {{word}}
     .indicator(:class="{[cardType]: cardType}")
+    .choices    
+        .brown(v-for="dir in brownDirections" :key="dir") 
+            label {{dir}}
+        .green(v-if="greenDirection")
+            label {{greenDirection}}
+
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 
-import {CardState, CardType} from "../model/cards";
+import {CardState, CardType, mapDirections} from "../model/cards";
 
 export default defineComponent({
     props: {
@@ -42,6 +48,20 @@ export default defineComponent({
                 }
             }
             return "";
+        },
+        brownDirections(): string[] {
+            if (this.state && this.state.type === "brown") {
+                const directions = mapDirections(this.state.selectedBy);
+                return directions;
+            }
+            return [];
+        },
+        greenDirection(): string | null {
+            if (this.state && this.state.type === "green") {
+                const [direction] = mapDirections(this.state.selectedBy);
+                return direction;
+            }
+            return null;
         }
     }
 })
@@ -51,19 +71,10 @@ export default defineComponent({
 $green-color: greenyellow;
 $black-color: darkslategray;
 $brown-color: burlywood;
-.black {
-    background-color: $black-color;
-}
-.brown {
-    background-color: $brown-color;
-}
-.green {
-    background-color: $green-color;
-}
 .word-card {
     min-width: 8em;
     padding: 0 1em;
-    min-height: 3em;
+    min-height: 3.5em;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -87,6 +98,22 @@ $brown-color: burlywood;
         border-bottom-left-radius: 4px;;
         border-bottom-right-radius: 4px;;
     }
+    &.black {
+        .indicator {
+            display: none;
+        }
+        .text {
+            color: transparent;
+        }
+    }
+    &.green {
+        .indicator {
+            display: none;
+        }
+        .text {
+            color: transparent;
+        }
+    }
     &:not(.read-only){
         cursor: pointer;
         &:hover {
@@ -95,5 +122,35 @@ $brown-color: burlywood;
             box-shadow: 0 0 10px #9ecaed;
         }
     }
+    .choices {
+        color: black;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: absolute;
+        left: 0.5em;
+        * {
+            padding: 0.1em;
+            min-width: 1.3em;
+            min-height: 1.3em;
+            text-align: center;
+            vertical-align: middle;
+            &:not(:last-child) {
+                margin-bottom: 0.1em;
+            }
+        }
+    }
+}
+.black {
+    background-color: $black-color;
+}
+.brown {
+    background-color: $brown-color;
+    &.indicator {
+        display: none;
+    }
+}
+.green {
+    background-color: $green-color;
 }
 </style>

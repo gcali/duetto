@@ -1,12 +1,19 @@
 <template lang="pug">
-input(v-model="readOnly", type="checkbox")
 input(v-model="generator")
 button(@click="generate") Generate
+label
+  input(type="radio" value="A" v-model="player")
+  | A
+label
+  input(type="radio" value="B" v-model="player")
+  | B
+.turn Turn: {{currentPlayer}}
 .main(v-if="words")
   Word(
     :word="fullWord.word"
-    :cardType="fullWord.type"
-    :readOnly="readOnly"
+    :cardType="fullWord.type[player]"
+    :readOnly="readOnly(fullWord)"
+    :state="fullWord.state"
     v-for="fullWord in words"
     class="word"
     @selected="() => clickWord(fullWord)"
@@ -27,22 +34,48 @@ export default defineComponent({
   },
   data() {
     return {
-      readOnly: false,
       generator: "apple"
     };
   },
   computed: {
     words(): FullWord[] {
       return this.$store.state.words || [];
+    },
+    player: {
+      get(): "A" | "B" {
+        return this.$store.state.player;
+      },
+      set(value: "A" | "B"): void {
+        this.$store.commit("setPlayer", value);
+      }
+    },
+    currentPlayer(): string {
+      return this.$store.state.currentPlayer || "None";
     }
   },
   methods: {
     clickWord(word: {word: string; type: string}) {
-      console.log(word);
+      this.$store.dispatch("playWord", word.word);
     },
     generate() {
       const words = generateWords(this.generator);
-      this.$store.commit("setAllWords", words)
+      this.$store.commit("setAllWords", words);
+      this.$store.commit("setTurnPlayer", this.player);
+    },
+    readOnly(word: FullWord): boolean {
+      if (word.state.type === "green" || word.state.type === "black") {
+        return true;
+      }
+      if (word.state.type !== "brown") {
+        return false;
+      }
+      const isMyTurn = this.$store.state.currentPlayer === this.$store.state.player;
+      if (isMyTurn && word.state.selectedBy !== "other") {
+        return true;
+      } else if (!isMyTurn && word.state.selectedBy != "you") {
+        return true;
+      }
+      return false;
     }
   }
 });

@@ -1,8 +1,9 @@
-<template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
-  </div>
+<template lang="pug">
+.home
+  .logo
+    | Placeholder
+  .main-content
+    HelloWorld
 </template>
 
 <script lang="ts">
@@ -16,3 +17,23 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss">
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .logo {
+    width: 20em;
+    height: 5em;
+    background-color: pink;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .main-content {
+    max-width: 100%;
+  }
+}
+</style>
