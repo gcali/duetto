@@ -22,6 +22,12 @@ export const mutations = {
   setGameOver(state: State, value: boolean) {
     state.gameOver = value;
   },
+  setGameWon(state: State, value: boolean) {
+    state.gameWon = value;
+  },
+  setDisablePass(state: State, value: boolean) {
+    state.disablePass = value;
+  },
   setPlayer(state: State, player: Player) {
     state.player = player;
   },

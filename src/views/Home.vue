@@ -21,11 +21,12 @@
         label
           input(type="checkbox", v-model="cheat")
           | Cheat
-      button(v-if="!readOnly",@click="pass") Pass
+      button(v-if="!readOnly && !passDisabled",@click="pass") Pass
       .you(v-if="hasToChooseFirstPlayer") You are: {{player}}
       .choose-first-player(v-if="hasToChooseFirstPlayer")
         button(v-for="p in ['A','B']", @click="select(p)") {{p}}
-      .game-over(v-if="gameOver") :(
+      .game-status(v-if="gameOver") :(
+      .game-status(v-if="gameWon") Yeeeeeee
     GameGrid(:words="words" :player="showForPlayer", :forceReadOnly="readOnly")
 </template>
 
@@ -66,8 +67,14 @@ export default defineComponent({
     gameOver() {
       return this.$store.state.gameOver;
     },
+    gameWon() {
+      return this.$store.state.gameWon;
+    },
+    passDisabled() {
+      return this.$store.state.disablePass;
+    },
     readOnly(): boolean {
-      return this.gameOver || this.hasToChooseFirstPlayer;
+      return this.gameOver || this.hasToChooseFirstPlayer || this.gameWon;
     },
     turnPass() {
       const player = this.$store.state.suggestions.player;
@@ -118,6 +125,9 @@ export default defineComponent({
   }
   .main-content {
     max-width: 100%;
+    .game-status {
+      font-weight: bold;
+    }
     .menu {
       display: flex;
       flex-direction: column;

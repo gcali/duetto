@@ -15,6 +15,8 @@ export const state = {
   player: "A" as Player,
   currentPlayer: "A" as Player,
   gameOver: false,
+  gameWon: false,
+  disablePass: false,
   suggestions: {
     remaining: 9,
     player: {

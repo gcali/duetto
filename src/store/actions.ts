@@ -18,14 +18,18 @@ export const actions = {
   async init({commit}: AugmentedActionContext, payload: { seed: string; player: Player; suggestions: number}) {
       const words = generateWords(payload.seed);
       commit("setGameOver", false);
+      commit("setGameWon", false);
       commit("setAllWords", words);
       commit("setPlayer", payload.player);
       commit("setTurnPlayer", "A");
       commit("setSuggestions", {remaining: payload.suggestions, player: {A: 0, B: 0}})
+      commit("setDisablePass", false);
   },
   pass({commit,state}: AugmentedActionContext) {
-    commit("increasePlayerSuggestions", state.currentPlayer);
-    commit("decreaseRemainingsuggestions", undefined);
+    if (state.suggestions.remaining) {
+      commit("increasePlayerSuggestions", state.currentPlayer);
+      commit("decreaseRemainingsuggestions", undefined);
+    }
     commit("changeTurnPlayer", undefined);
   },
   async playWord({commit, state}: AugmentedActionContext, payload: string): Promise<void> {
@@ -37,11 +41,20 @@ export const actions = {
       return;
     }
 
-    const playResult = gameplay.playWord(word, {player: state.player, currentPlayer: state.currentPlayer});
+    const playResult = gameplay.playWord(
+      word, 
+      {player: state.player, currentPlayer: state.currentPlayer},
+      {words: state.words, remainingSuggestions: state.suggestions.remaining}
+    );
     commit("setWordState", {word: payload, state: playResult.state});
-    if (playResult.nextPlayer === null || (playResult.loseSuggestion && state.suggestions.remaining === 1)) {
+    if (playResult.isGameWon) {
+      commit("setGameWon", true);
+    } else if (playResult.nextPlayer === null) {
         commit("setGameOver", true);
     } else {
+        if (playResult.disablePass) {
+          commit("setDisablePass", true);
+        }
         commit("setTurnPlayer", playResult.nextPlayer);
         if (playResult.loseSuggestion) {
           commit("decreaseRemainingsuggestions", undefined);
