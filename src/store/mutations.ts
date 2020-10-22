@@ -1,6 +1,6 @@
 import { CardState, FullWord } from '@/model/cards';
 import { Player } from '@/model/player';
-import { State } from "./state";
+import { State, Suggestions } from "./state";
 
 export const mutations = {
   setAllWords(state: State, words: FullWord[] | null) {
@@ -33,6 +33,15 @@ export const mutations = {
       return;
     }
     state.currentPlayer = (state.currentPlayer === "A" ? "B" : "A");
+  },
+  setSuggestions(state: State, suggestions: Suggestions) {
+    state.suggestions = {...suggestions, player: {...suggestions.player}};
+  },
+  increasePlayerSuggestions(state: State, player: Player) {
+    state.suggestions.player[player]++;
+  },
+  decreaseRemainingsuggestions(state: State) {
+    state.suggestions.remaining--;
   }
 }
 

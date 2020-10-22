@@ -1,19 +1,32 @@
 <template lang="pug">
 .home
-  .logo
+  .logo(@dblclick="showCheat = !showCheat")
     | Placeholder
   .game-choooser(v-if="hasToStartGame")
     GameChooser(@start="startGame")
   .main-content(v-else)
-    button(@click="resetGame") New game
-    .current Current player: {{currentPlayer}}
-    .you You are: {{player}}
-    .cheat
-      label
-        input(type="checkbox", v-model="cheat")
-        | Cheat
-    .game-over(v-if="gameOver") :(
-    GameGrid(:words="words" :player="showForPlayer")
+    .menu
+      button(@click="resetGame") New game
+      .note(v-if="player === currentPlayer && !hasToChooseFirstPlayer") It's your turn!
+      .turn-section(v-if="!hasToChooseFirstPlayer")
+        .player(:class="{current: currentPlayer === 'A'}") A 
+        .turns
+          .turn(v-for="i in turnPass.A") ✓
+        .player(:class="{current: currentPlayer === 'B'}") B
+        .turns
+          .turn(v-for="i in turnPass.B") ✓
+        .remaining-turns
+          .turn(v-for="i in remainingSuggestions") 👤
+      .cheat(v-if="showCheat")
+        label
+          input(type="checkbox", v-model="cheat")
+          | Cheat
+      button(v-if="!readOnly",@click="pass") Pass
+      .you(v-if="hasToChooseFirstPlayer") You are: {{player}}
+      .choose-first-player(v-if="hasToChooseFirstPlayer")
+        button(v-for="p in ['A','B']", @click="select(p)") {{p}}
+      .game-over(v-if="gameOver") :(
+    GameGrid(:words="words" :player="showForPlayer", :forceReadOnly="readOnly")
 </template>
 
 <script lang="ts">
@@ -32,7 +45,9 @@ export default defineComponent({
   data() {
     return {
       hasToStartGame: true,
-      cheat: false
+      cheat: false,
+      showCheat: false,
+      hasToChooseFirstPlayer: true
     }
   },
   computed: {
@@ -50,15 +65,34 @@ export default defineComponent({
     },
     gameOver() {
       return this.$store.state.gameOver;
+    },
+    readOnly(): boolean {
+      return this.gameOver || this.hasToChooseFirstPlayer;
+    },
+    turnPass() {
+      const player = this.$store.state.suggestions.player;
+      console.log(player);
+      return player;
+    },
+    remainingSuggestions(): number {
+      return this.$store.state.suggestions.remaining;
     }
   },
   methods: {
     startGame(arg: StartArgument) {
-      this.$store.dispatch("init", {seed: arg.password, player: arg.player});
+      this.$store.dispatch("init", {seed: arg.password, player: arg.player, suggestions: arg.suggestions});
       this.hasToStartGame = false;
+      this.hasToChooseFirstPlayer = true;
     },
     resetGame() {
       this.hasToStartGame = true;
+    },
+    pass() {
+      this.$store.dispatch("pass", undefined);
+    },
+    select(player: Player) {
+      this.$store.commit("setTurnPlayer", player);
+      this.hasToChooseFirstPlayer = false;
     }
   }
 });
@@ -77,9 +111,59 @@ export default defineComponent({
     display: flex;
     justify-content: center;
     align-items: center;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   .main-content {
     max-width: 100%;
+    .menu {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .note {
+      font-weight: bold;
+      display: inline-block;
+    }
+    .turn-section {
+      margin: 0.2em 0;
+      .player {
+        position: relative;
+        padding: 0.1em 0.2em;
+        &.current {
+          border: 1px solid black;
+          &:before {
+            position: absolute;
+            left: -1em;
+            top: -0.1em;
+            content: '→'
+          }
+        }
+      }
+      display: grid;
+      grid-template-columns: 0fr 1fr;
+      gap: 0.1em;
+      .turn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        background-color: green;
+        color: white;
+        padding: 0.1em 0.2em;
+        &:not(:last-child) {
+          margin-right: 0.2em;
+        }
+      }
+      .remaining-turns {
+        grid-column: span 2;
+        .turn {
+          background-color: burlywood;
+          padding: 0.2em 0.2em;
+        }
+      }
+    } 
   }
 }
 </style>

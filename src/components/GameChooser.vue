@@ -10,6 +10,8 @@ form.game-chooser(@submit.prevent="start")
         label
             input(type="radio" value="B" v-model="player")
             | B
+    label Suggestions
+    input(type="number",v-model="suggestions")
     .start
         input(type="submit", :disabled="!canStart", value="Start")
 </template>
@@ -17,12 +19,13 @@ form.game-chooser(@submit.prevent="start")
 <script lang="ts">
 import { Player } from '@/model/player';
 import { defineComponent } from 'vue'
-export type StartArgument = {password: string; player: Player};
+export type StartArgument = {password: string; player: Player; suggestions: number};
 export default defineComponent({
     data() {
         return {
             password: "",
-            player: "A" as Player
+            player: "A" as Player,
+            suggestions: 9
         };
     },
     computed: {
@@ -35,7 +38,7 @@ export default defineComponent({
     },
     methods: {
         start() {
-            this.$emit("start", {password: this.password, player: this.player} as StartArgument);
+            this.$emit("start", {password: this.password, player: this.player, suggestions: this.suggestions} as StartArgument);
         }
     }
 })

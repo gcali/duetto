@@ -15,12 +15,18 @@ type AugmentedActionContext = {
 } & Omit<ActionContext<State, State>, 'commit'>
 
 export const actions = {
-  async init({commit}: AugmentedActionContext, payload: { seed: string; player: Player}) {
+  async init({commit}: AugmentedActionContext, payload: { seed: string; player: Player; suggestions: number}) {
       const words = generateWords(payload.seed);
       commit("setGameOver", false);
       commit("setAllWords", words);
       commit("setPlayer", payload.player);
       commit("setTurnPlayer", "A");
+      commit("setSuggestions", {remaining: payload.suggestions, player: {A: 0, B: 0}})
+  },
+  pass({commit,state}: AugmentedActionContext) {
+    commit("increasePlayerSuggestions", state.currentPlayer);
+    commit("decreaseRemainingsuggestions", undefined);
+    commit("changeTurnPlayer", undefined);
   },
   async playWord({commit, state}: AugmentedActionContext, payload: string): Promise<void> {
     if (!state.words || !state.currentPlayer) {
@@ -33,10 +39,13 @@ export const actions = {
 
     const playResult = gameplay.playWord(word, {player: state.player, currentPlayer: state.currentPlayer});
     commit("setWordState", {word: payload, state: playResult.state});
-    if (playResult.nextPlayer === null) {
+    if (playResult.nextPlayer === null || (playResult.loseSuggestion && state.suggestions.remaining === 1)) {
         commit("setGameOver", true);
     } else {
         commit("setTurnPlayer", playResult.nextPlayer);
+        if (playResult.loseSuggestion) {
+          commit("decreaseRemainingsuggestions", undefined);
+        }
     }
   }
 }

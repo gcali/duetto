@@ -28,12 +28,13 @@ export default defineComponent({
     player: {
       type: String as PropType<Player>,
       required: true
+    },
+    forceReadOnly: {
+      type: Boolean,
+      required: true
     }
   },
   computed: {
-    gameOver(): boolean {
-      return this.$store.state.gameOver;
-    },
     currentPlayer(): string {
       return this.$store.state.currentPlayer || "None";
     }
@@ -43,7 +44,7 @@ export default defineComponent({
       this.$store.dispatch("playWord", word.word);
     },
     readOnly(word: FullWord): boolean {
-      if (this.gameOver) {
+      if (this.forceReadOnly) {
         return true;
       }
       if (word.state.type === "green" || word.state.type === "black") {
