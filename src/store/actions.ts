@@ -1,3 +1,4 @@
+import { Language } from '@/data/words';
 import { Player } from '@/model/player';
 import { Gameplay } from '@/services/gameplay';
 import { generateWords } from '@/services/word-generator';
@@ -15,8 +16,8 @@ type AugmentedActionContext = {
 } & Omit<ActionContext<State, State>, 'commit'>
 
 export const actions = {
-  async init({commit}: AugmentedActionContext, payload: { seed: string; player: Player; suggestions: number}) {
-      const words = generateWords(payload.seed);
+  async init({commit}: AugmentedActionContext, payload: { seed: string; player: Player; suggestions: number; language: Language}) {
+      const words = generateWords(payload.seed, payload.language);
       commit("setGameOver", false);
       commit("setGameWon", false);
       commit("setAllWords", words);

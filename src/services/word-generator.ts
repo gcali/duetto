@@ -16,14 +16,14 @@ type FirstWord = {
   type: CardType;
 }
 
-export const generateWords = (seed: string): FullWord[] => {
+export const generateWords = (seed: string, language: "italian" | "english"): FullWord[] => {
 
-  const uniqueWords = new Set<string>(wordList);
+  const words = wordList[language];
     const random = mulberry(seed);
     const selectedWords: Set<string> = new Set<string>();
     while (selectedWords.size < 25) {
-      const index = random.randomIntFromInterval(0, wordList.length-1);
-      selectedWords.add(wordList[index]);
+      const index = random.randomIntFromInterval(0, words.length-1);
+      selectedWords.add(words[index]);
     }
 
     const browns: string[] = [];

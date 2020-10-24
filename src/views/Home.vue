@@ -1,7 +1,7 @@
 <template lang="pug">
 .home
   .logo(@dblclick="showCheat = !showCheat")
-    | Placeholder
+    | Duetto
   .game-choooser(v-if="hasToStartGame")
     GameChooser(@start="startGame")
   .main-content(v-else)
@@ -87,7 +87,7 @@ export default defineComponent({
   },
   methods: {
     startGame(arg: StartArgument) {
-      this.$store.dispatch("init", {seed: arg.password, player: arg.player, suggestions: arg.suggestions});
+      this.$store.dispatch("init", {seed: arg.password, player: arg.player, suggestions: arg.suggestions, language: arg.language});
       this.hasToStartGame = false;
       this.hasToChooseFirstPlayer = true;
     },
