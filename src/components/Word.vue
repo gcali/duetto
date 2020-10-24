@@ -1,5 +1,5 @@
 <template lang="pug">
-.word-card(:class="[{['read-only']: readOnly}, wordCardClass]", @click="click")
+.word-card(:class="[{['read-only']: readOnly}, wordCardClass]", @dblclick="click")
     label.text {{word}}
     .indicator(:class="{[cardType]: cardType}")
     .choices    
