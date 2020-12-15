@@ -1,6 +1,6 @@
 <template lang="pug">
 #app
-  Home
+  router-view
 </template>
 
 <script lang="ts">

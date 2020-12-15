@@ -2,6 +2,7 @@
 .home
   .logo(@dblclick="showCheat = !showCheat")
     | Duetto
+  router-link(to="login") Login
   .game-choooser(v-if="hasToStartGame")
     GameChooser(@start="startGame")
   .main-content(v-else)

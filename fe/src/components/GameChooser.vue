@@ -24,7 +24,7 @@ form.game-chooser(@submit.prevent="start")
 </template>
 
 <script lang="ts">
-import { Player } from '@/model/player';
+import { Player } from '../model/player';
 import { defineComponent } from 'vue'
 export type StartArgument = {
     password: string;

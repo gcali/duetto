@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Duetto.Api.Hubs;
 using Duetto.Api.Services.User;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -52,6 +53,8 @@ namespace Duetto.Api
                 });
 
             services.AddTransient<IUserService, MemoryUserService>();
+            services.AddSignalR();
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -66,6 +69,8 @@ namespace Duetto.Api
 
             app.UseHttpsRedirection();
 
+            app.UseCors(e => e.AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowed(e => true).AllowCredentials());
+
             app.UseRouting();
 
             app.UseAuthentication();
@@ -73,6 +78,7 @@ namespace Duetto.Api
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<GameHub>("/ws");
                 endpoints.MapControllers();
             });
         }
